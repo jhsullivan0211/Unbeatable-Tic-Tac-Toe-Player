@@ -16,5 +16,12 @@ namespace TicTacToeEngine
         {
             InitializeComponent();
         }
+
+        private void BoardPicture_Click(object sender, EventArgs e)
+        {
+           
+        }
+
+        
     }
 }

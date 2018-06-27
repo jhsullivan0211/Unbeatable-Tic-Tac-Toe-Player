@@ -28,36 +28,38 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.BoardPicture = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // BoardPicture
             // 
-            this.pictureBox1.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
-            this.pictureBox1.Location = new System.Drawing.Point(197, 40);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(512, 512);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.BoardPicture.BackColor = System.Drawing.Color.Transparent;
+            this.BoardPicture.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
+            this.BoardPicture.Location = new System.Drawing.Point(197, 40);
+            this.BoardPicture.Name = "BoardPicture";
+            this.BoardPicture.Size = new System.Drawing.Size(512, 512);
+            this.BoardPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.BoardPicture.TabIndex = 0;
+            this.BoardPicture.TabStop = false;
+            this.BoardPicture.Click += new System.EventHandler(this.BoardPicture_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(905, 605);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.BoardPicture);
             this.Name = "MainForm";
             this.Text = "Tic Tac Toe";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        public System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.PictureBox BoardPicture;
     }
 }
 

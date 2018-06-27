@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -83,13 +86,16 @@
     <None Include="Resources\TicTacToeBoard.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\TicTacToeBoard.bmp" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Resources\TicTaceToeBoard.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\TicTacToeX.png" />
+    <None Include="Resources\TicTacToeO.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\TicTacToeO.png" />
+    <None Include="Resources\TicTacToeX.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
