@@ -81,7 +81,7 @@ namespace TicTacToe
             return mark;
         }
 
-        public void update()
+        public void Update()
         {
             
         }
