@@ -36,7 +36,7 @@
             // 
             this.BoardPicture.BackColor = System.Drawing.Color.Transparent;
             this.BoardPicture.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
-            this.BoardPicture.Location = new System.Drawing.Point(197, 40);
+            this.BoardPicture.Location = new System.Drawing.Point(50, 66);
             this.BoardPicture.Name = "BoardPicture";
             this.BoardPicture.Size = new System.Drawing.Size(512, 512);
             this.BoardPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
