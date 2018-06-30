@@ -19,8 +19,9 @@ namespace TicTacToeEngine
             InitializeComponent();
         }
 
+        private void ticTacToeBoard1_Click(object sender, EventArgs e)
+        {
 
-
-        
+        }
     }
 }

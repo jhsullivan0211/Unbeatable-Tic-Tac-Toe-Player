@@ -15,7 +15,7 @@ namespace TicTacToe
     static class Program
     {
         /// <summary>
-        /// The main entry point for the application.  Creates the necessary game data and loads the form.
+        /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
@@ -23,10 +23,6 @@ namespace TicTacToe
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MainForm form = new MainForm();
-
-
-
-
             Application.Run(form);
         }
     }
@@ -223,64 +219,9 @@ namespace TicTacToe
     /// </summary>
     public class BoardDrawer
     {
-        GameBoard gameBoard;
-        PictureBox boardPicture;
+        
 
-        /// <summary>
-        /// Basic constructor for the BoardDrawer class.
-        /// </summary>
-        /// <param name="gameBoard">The GameBoard to get the data from which to draw.</param>
-        /// <param name="form">The Form containing the BoardPicture Control.</param>
-        public BoardDrawer(GameBoard gameBoard, PictureBox boardPicture)
-        {
-            this.gameBoard = gameBoard;
-            this.boardPicture = boardPicture;
-            boardPicture.SendToBack();
-        }
-
-        /// <summary>
-        /// The BoardPicture property represents the picture box containing the actual drawing of the Tic Tac Toe 
-        /// board background without any marks.
-        /// </summary>
-        /// <value>The BoardPicture property gets the value of the field boardPicture.</value>
-        public PictureBox BoardPicture
-        {
-            get { return this.boardPicture; }
-        }
-
-        /// <summary>
-        /// Creates and returns a marking Control with a picture that corresponds to the 
-        /// specified character ('X' or 'O'), positioned at the x and y coordinates.
-        /// </summary>
-        /// <param name="marking">The character ('X' or 'O') that defines the marking image.</param>
-        /// <param name="x">The x-coordinate (screen coordinate) of the mark.</param>
-        /// <param name="y">The y-coordinate (screen coordinate) of the mark.</param>
-        /// <returns>Returns the created PictureBox containing the mark image at the specified location.</returns>
-        private PictureBox CreateMark(char marking, int x, int y)
-        {
-            PictureBox mark = new PictureBox();
-            double widthScalar = 0.65;
-            double heightScalar = 0.65;
-
-            mark.SizeMode = PictureBoxSizeMode.StretchImage;
-            mark.Width = (int)((boardPicture.Width / 3) * widthScalar);
-            mark.Height = (int)((boardPicture.Height / 3) * heightScalar);
-            mark.Parent = boardPicture;
-            mark.BackColor = System.Drawing.Color.Transparent;
-            mark.Left = x;
-            mark.Top = y;
-
-            if (marking == 'O')
-            {
-                mark.Image = TicTacToeEngine.Properties.Resources.TicTacToeO;
-            }
-            if (marking == 'X')
-            {
-                mark.Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
-            }
-
-            return mark;
-        }
+        
 
         /// <summary>
         /// To be called after any change to the GameBoard.  Draws (creates a visible Control at) the last mark that the 
@@ -288,33 +229,14 @@ namespace TicTacToe
         /// </summary>
         public void Update()
         {
-            char mark = gameBoard.CurrentTurn == 'X' ? 'O' : 'X';
-            int[] point = GetScreenPoint(gameBoard.LastMove);
-            PictureBox markPicture = CreateMark(mark, point[0], point[1]);
-            markPicture.Parent = boardPicture;
+
+            //char mark = gameBoard.CurrentTurn == 'X' ? 'O' : 'X';
+            //int[] point = GetScreenPoint(gameBoard.LastMove);
+            //PictureBox markPicture = CreateMark(mark, point[0], point[1]);
+            //markPicture.Parent = boardPicture;
         }
 
-        /// <summary>
-        /// Converts a tic tac toe point into a real point on the screen relative to
-        /// the background picture of the game board.
-        /// </summary>
-        /// <param name="point">The point (x, y) to convert.</param>
-        /// <returns></returns>
-        private int[] GetScreenPoint(int[] point)
-        {
-            if (point.Length != 2)
-            {
-                throw new System.ArgumentException("Array argument must be of length 2.");
-            }
-            int unitX = boardPicture.Width / 3;
-            int unitY = boardPicture.Height / 3;
-            int offsetX = boardPicture.Width / 15;
-            int offsetY = boardPicture.Height / 15;
-            int[] result = new int[2];
-            result[0] = (point[0] * unitX + offsetX);
-            result[1] = (point[1] * unitY + offsetY);
-            return result;
-        }
+       
     }
 
     /// <summary>
@@ -349,22 +271,38 @@ namespace TicTacToe
     public class TicTacToeBoard : PictureBox
     {
         GameBoard gameBoard;
-        BoardDrawer drawer;
         bool isFinished = false;
+        PictureBox[,] markMatrix;
+
+        const double markWidthScalar = 0.65;
+        const double markHeightScalar = 0.65;
 
         /// <summary>
-        /// Basic constructor.  Initializes the GameBoard and BoardDrawer, and adds a click event listener
-        /// to this Control.
+        /// Basic constructor.  Initializes the GameBoard and BoardDrawer, adds a click event listener
+        /// to this Control, and creates the mark picture boxes.
         /// </summary>
         public TicTacToeBoard() : base()
         {
+            Debug.WriteLine(this.Width);
             this.gameBoard = new GameBoard();
-            this.drawer = new BoardDrawer(this.gameBoard, this);
             this.Click += (sender, e) =>
             {
                 MouseEventArgs click = (MouseEventArgs)e;
                 ProcessClick(click.X, click.Y);
             };
+
+            markMatrix = new PictureBox[gameBoard.MoveMatrix.GetLength(0), gameBoard.MoveMatrix.GetLength(1)];
+            
+            for (int i = 0; i < markMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < markMatrix.GetLength(1); j++)
+                {
+                    markMatrix[i, j] = CreateMark(j, i);
+                }
+            }
+
+           
+            
         }
 
         /// <summary>
@@ -384,14 +322,84 @@ namespace TicTacToe
 
             if (gameBoard.Mark(convertedX, convertedY))
             {
+                UpdateMarks();
                 char winner = gameBoard.TestBoard();
                 if (winner != 'N')
                 {
                     isFinished = true;
                     Debug.WriteLine(winner);
                 }
-                drawer.Update();
+                
             }
+        }
+
+        /// <summary>
+        /// Creates and returns a marking Control with a picture that corresponds to the 
+        /// specified character ('X' or 'O'), positioned at the x and y coordinates.
+        /// </summary>
+        /// <param name="marking">The character ('X' or 'O') that defines the marking image.</param>
+        /// <param name="x">The x-coordinate (screen coordinate) of the mark.</param>
+        /// <param name="y">The y-coordinate (screen coordinate) of the mark.</param>
+        /// <returns>Returns the created PictureBox containing the mark image at the specified location.</returns>
+        private PictureBox CreateMark(int x, int y)
+        {
+            PictureBox mark = new PictureBox();
+            mark.BackColor = System.Drawing.Color.Transparent;
+            mark.SizeMode = PictureBoxSizeMode.StretchImage;
+            int[] point = GetScreenPoint(new int[] { x, y });
+            mark.Left = point[0];
+            mark.Top = point[1];
+            mark.Visible = false;
+            mark.Parent = this;
+            return mark;
+        }
+
+        private void UpdateMarks()
+        {
+            for (int i = 0; i < gameBoard.MoveMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < gameBoard.MoveMatrix.GetLength(1); j++)
+                {
+                    char mark = gameBoard.MoveMatrix[i, j];
+                    switch(mark)
+                    {
+                        case ('N'):
+                            continue;
+                        case ('X'):
+                            markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
+                            break;
+                        case ('O'):
+                            markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeO;                         
+                            break;                       
+                    }
+                    markMatrix[i, j].Width = (int)((this.Width / 3) * markWidthScalar);
+                    markMatrix[i, j].Height = (int)((this.Height / 3) * markHeightScalar);
+                    markMatrix[i, j].Visible = true;
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Converts a tic tac toe point into a real point on the screen relative to
+        /// the background picture of the game board.
+        /// </summary>
+        /// <param name="point">The point (x, y) to convert.</param>
+        /// <returns></returns>
+        private int[] GetScreenPoint(int[] point)
+        {
+            if (point.Length != 2)
+            {
+                throw new System.ArgumentException("Array argument must be of length 2.");
+            }
+            int unitX = this.Width / 3;
+            int unitY = this.Height / 3;
+            int offsetX = this.Width / 15;
+            int offsetY = this.Height / 15;
+            int[] result = new int[2];
+            result[0] = (point[0] * unitX + offsetX);
+            result[1] = (point[1] * unitY + offsetY);
+            return result;
         }
 
         /// <summary>
