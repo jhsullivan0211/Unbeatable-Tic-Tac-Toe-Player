@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Resources;
@@ -72,6 +73,8 @@ namespace TicTacToe
         /// </summary>
         /// <param name="x">The column coordinate to mark, from 0 to 2 inclusive.</param>
         /// <param name="y">The row coordinate to mark, from 0 to 2 inclusive</param>
+        /// <param name="marking">The marking to mark with; defaults to 'z' which is converted within the method to the current
+        /// player's mark.</param>
         /// <returns>Returns whether or not the mark was successful, i.e. a valid empty position was chosen.</returns>
         public bool Mark(int x, int y, char marking = 'z')
         {
@@ -214,30 +217,6 @@ namespace TicTacToe
     }
 
 
-    /// <summary>
-    /// Displays the data of a GameBoard for the user to see.
-    /// </summary>
-    public class BoardDrawer
-    {
-        
-
-        
-
-        /// <summary>
-        /// To be called after any change to the GameBoard.  Draws (creates a visible Control at) the last mark that the 
-        /// GameBoard received.
-        /// </summary>
-        public void Update()
-        {
-
-            //char mark = gameBoard.CurrentTurn == 'X' ? 'O' : 'X';
-            //int[] point = GetScreenPoint(gameBoard.LastMove);
-            //PictureBox markPicture = CreateMark(mark, point[0], point[1]);
-            //markPicture.Parent = boardPicture;
-        }
-
-       
-    }
 
     /// <summary>
     /// The AI component of the computer player.
@@ -258,7 +237,11 @@ namespace TicTacToe
 
         public List<GameBoard> GenerateChildren(GameBoard board)
         {
-            return null;
+            List<GameBoard> children = new List<GameBoard>();
+
+
+
+            return children;
         }
     }
 
@@ -283,7 +266,7 @@ namespace TicTacToe
         /// </summary>
         public TicTacToeBoard() : base()
         {
-            Debug.WriteLine(this.Width);
+
             this.gameBoard = new GameBoard();
             this.Click += (sender, e) =>
             {
@@ -291,8 +274,18 @@ namespace TicTacToe
                 ProcessClick(click.X, click.Y);
             };
 
-            markMatrix = new PictureBox[gameBoard.MoveMatrix.GetLength(0), gameBoard.MoveMatrix.GetLength(1)];
             
+            this.Image = TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
+            markMatrix = new PictureBox[gameBoard.MoveMatrix.GetLength(0), gameBoard.MoveMatrix.GetLength(1)];
+
+        }
+
+        /// <summary>
+        /// Method called after the control is created.
+        /// </summary>
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
             for (int i = 0; i < markMatrix.GetLength(0); i++)
             {
                 for (int j = 0; j < markMatrix.GetLength(1); j++)
@@ -300,9 +293,6 @@ namespace TicTacToe
                     markMatrix[i, j] = CreateMark(j, i);
                 }
             }
-
-           
-            
         }
 
         /// <summary>
@@ -313,8 +303,8 @@ namespace TicTacToe
         /// <param name="y">The y coordinate of the click.</param>
         public void ProcessClick(int x, int y)
         {
-            if (isFinished) return;
 
+            if (isFinished) return;
             int unitX = this.Width / 3;
             int unitY = this.Height / 3;       
             int convertedX = x / unitX;
@@ -337,7 +327,6 @@ namespace TicTacToe
         /// Creates and returns a marking Control with a picture that corresponds to the 
         /// specified character ('X' or 'O'), positioned at the x and y coordinates.
         /// </summary>
-        /// <param name="marking">The character ('X' or 'O') that defines the marking image.</param>
         /// <param name="x">The x-coordinate (screen coordinate) of the mark.</param>
         /// <param name="y">The y-coordinate (screen coordinate) of the mark.</param>
         /// <returns>Returns the created PictureBox containing the mark image at the specified location.</returns>
@@ -347,13 +336,20 @@ namespace TicTacToe
             mark.BackColor = System.Drawing.Color.Transparent;
             mark.SizeMode = PictureBoxSizeMode.StretchImage;
             int[] point = GetScreenPoint(new int[] { x, y });
+            mark.Width = (int)((this.Width / 3) * markWidthScalar);
+            mark.Height = (int)((this.Height / 3) * markHeightScalar);
             mark.Left = point[0];
             mark.Top = point[1];
+           
+
             mark.Visible = false;
             mark.Parent = this;
             return mark;
         }
 
+        /// <summary>
+        /// Updates the mark images to reflect the data of the gameBoard field.
+        /// </summary>
         private void UpdateMarks()
         {
             for (int i = 0; i < gameBoard.MoveMatrix.GetLength(0); i++)
@@ -361,9 +357,14 @@ namespace TicTacToe
                 for (int j = 0; j < gameBoard.MoveMatrix.GetLength(1); j++)
                 {
                     char mark = gameBoard.MoveMatrix[i, j];
+                    if (markMatrix[i, j] == null)
+                    {
+                        return;
+                    }
                     switch(mark)
                     {
                         case ('N'):
+                            markMatrix[i, j].Visible = false;
                             continue;
                         case ('X'):
                             markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
@@ -372,8 +373,6 @@ namespace TicTacToe
                             markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeO;                         
                             break;                       
                     }
-                    markMatrix[i, j].Width = (int)((this.Width / 3) * markWidthScalar);
-                    markMatrix[i, j].Height = (int)((this.Height / 3) * markHeightScalar);
                     markMatrix[i, j].Visible = true;
 
                 }
@@ -402,13 +401,25 @@ namespace TicTacToe
             return result;
         }
 
+        public void Reset()
+        {
+            this.GameBoard = new GameBoard();
+        }
+
+   
+
         /// <summary>
-        /// The GameBoard for which this Control shows the data.
+        /// The GameBoard property represents the data for which spaces are marked, which this control draws.
         /// </summary>
+        ///<value>Sets/gets the value of the gameBoard field.  NOTE: when setting, calls the method to update
+        ///mark graphics.</value> 
+
         public GameBoard GameBoard
         {
             get { return this.gameBoard; }
-            set { gameBoard = value; }
+            set { gameBoard = value;
+                UpdateMarks();
+            }
         }
 
 
