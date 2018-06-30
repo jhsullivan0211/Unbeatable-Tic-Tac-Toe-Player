@@ -28,38 +28,54 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.BoardPicture = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.ticTacToeBoard2 = new TicTacToe.TicTacToeBoard();
+            this.ticTacToeBoard1 = new TicTacToe.TicTacToeBoard();
+            ((System.ComponentModel.ISupportInitialize)(this.ticTacToeBoard2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ticTacToeBoard1)).BeginInit();
             this.SuspendLayout();
             // 
-            // BoardPicture
+            // ticTacToeBoard2
             // 
-            this.BoardPicture.BackColor = System.Drawing.Color.Transparent;
-            this.BoardPicture.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
-            this.BoardPicture.Location = new System.Drawing.Point(50, 66);
-            this.BoardPicture.Name = "BoardPicture";
-            this.BoardPicture.Size = new System.Drawing.Size(512, 512);
-            this.BoardPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.BoardPicture.TabIndex = 0;
-            this.BoardPicture.TabStop = false;
-            this.BoardPicture.Click += new System.EventHandler(this.BoardPicture_Click);
+            this.ticTacToeBoard2.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
+            this.ticTacToeBoard2.Location = new System.Drawing.Point(28, 129);
+            this.ticTacToeBoard2.Name = "ticTacToeBoard2";
+            this.ticTacToeBoard2.Size = new System.Drawing.Size(300, 300);
+            this.ticTacToeBoard2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.ticTacToeBoard2.TabIndex = 1;
+            this.ticTacToeBoard2.TabStop = false;
+
+            // 
+            // ticTacToeBoard1
+            // 
+            this.ticTacToeBoard1.Image = global::TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
+            this.ticTacToeBoard1.Location = new System.Drawing.Point(360, 24);
+            this.ticTacToeBoard1.Name = "ticTacToeBoard1";
+            this.ticTacToeBoard1.Size = new System.Drawing.Size(512, 512);
+            this.ticTacToeBoard1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.ticTacToeBoard1.TabIndex = 0;
+            this.ticTacToeBoard1.TabStop = false;
+
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(905, 605);
-            this.Controls.Add(this.BoardPicture);
+            this.Controls.Add(this.ticTacToeBoard2);
+            this.Controls.Add(this.ticTacToeBoard1);
             this.Name = "MainForm";
             this.Text = "Tic Tac Toe";
-            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ticTacToeBoard2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ticTacToeBoard1)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        public System.Windows.Forms.PictureBox BoardPicture;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private TicTacToe.TicTacToeBoard ticTacToeBoard2;
+        private TicTacToe.TicTacToeBoard ticTacToeBoard1;
     }
 }
 

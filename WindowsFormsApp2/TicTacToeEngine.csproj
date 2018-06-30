@@ -86,12 +86,6 @@
     <None Include="Resources\TicTacToeBoard.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\TicTacToeBoard.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TicTaceToeBoard.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\TicTacToeO.png" />
   </ItemGroup>
   <ItemGroup>
