@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,12 @@ namespace TicTacToeEngine
             InitializeComponent();
         }
 
+
         private void button1_Click(object sender, EventArgs e)
         {
-            ticTacToeBoard2.GameBoard = ticTacToeBoard1.GameBoard;
+            ticTacToeBoard1.Reset();
         }
+
+        
     }
 }

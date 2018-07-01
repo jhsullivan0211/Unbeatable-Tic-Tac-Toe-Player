@@ -41,6 +41,7 @@ namespace TicTacToe
         int turnNumber = 0;
         int[] lastMove;
 
+
         //These data structures hold the number of Xs and Os in each row, column and diagonal.
         //Within each data structure, the value at index 0 corresponds to the number of Xs in
         //that row/column/diagonal, and the value at index 1 corresponds to the number of Os.
@@ -153,22 +154,25 @@ namespace TicTacToe
         {
             GameBoard copy = new GameBoard();
             int count = 0;
-            for (int i = 0; i < moveMatrix.GetLength(0); i++)
+
+            Utility.ActOnMatrix((i, j) =>
             {
-                for (int j = 0; j < moveMatrix.GetLength(1); j++)
+                char mark = moveMatrix[i, j];
+
+                if (mark == 'X')
                 {
-                    char mark = moveMatrix[i, j];
-                    if (mark == 'X')
-                    {
-                        count += 1;
-                    }
-                    if (mark == 'O')
-                    {
-                        count -= 1;
-                    }
-                    copy.Mark(j, i, moveMatrix[i, j]);
+                    count++;
                 }
-            }
+                if (mark == 'O')
+                {
+                    count--;
+                }
+                if (mark != 'N')
+                {
+                    copy.Mark(j, i, moveMatrix[i, j]);
+                }             
+            });
+                                    
             char turn = (count <= 0) ? 'X' : 'O';
             copy.CurrentTurn = turn;
 
@@ -217,29 +221,124 @@ namespace TicTacToe
     }
 
 
-
     /// <summary>
     /// The AI component of the computer player.
     /// </summary>
-    public class AIEngine
+    public static class AIEngine
     {
-        public int[] GetNextMove(char[,] moveMatrix)
+        /// <summary>
+        /// Returns the best possible move for the current player of a GameBoard to make.  Uses the minimax
+        /// algorithm with alpha-beta pruning to make its choice.  To provide a more life-like response, uses
+        /// a random number generator to select between the best possible moves.
+        /// </summary>
+        /// <param name="board">The GameBoard to evalutate.</param>
+        /// <returns>Returns a point (x, y) that represents the best move for the current player on the board.</returns>
+        public static int[] GetNextMove(GameBoard board)
         {
 
+            List<GameBoard> children = GenerateChildren(board);
+            List<GameBoard> winners = new List<GameBoard>();
+            List<GameBoard> ties = new List<GameBoard>();
+            int desiredOutcome = board.CurrentTurn == 'X' ? 1 : -1;
+            foreach (GameBoard child in children)
+            {
+                if (child.TestBoard() == board.CurrentTurn)
+                {
+                    return child.LastMove;
+                }
 
-            return null;
+                int potential = Minimax(child, -2, 2, child.CurrentTurn == 'X');
+
+                if (potential == desiredOutcome)
+                {
+                    winners.Add(child);
+                }
+                if (potential == 0)
+                {
+                    ties.Add(child);
+                }
+            }
+
+            Random rnd = new Random();
+            int index;
+            if (winners.Count > 0)
+            {
+                index = rnd.Next(0, winners.Count);
+                return winners[index].LastMove;
+            }
+            index = rnd.Next(0, ties.Count);
+            return ties[index].LastMove;
+
         }
 
-        public GameBoard Minimax(GameBoard board, int alpha, int beta, bool isTurnX)
+        /// <summary>
+        /// The minimax algorithm, which predicts the outcome of a board, assuming optimal playing from both sides.
+        /// Returns 1 for a predicted 'X' win, 0 for a predicted tie, and -1 for a predicted 'O' win. Uses alpha-beta
+        /// pruning to speed up the algorithm.
+        /// </summary>
+        /// <param name="board">The GameBoard to evaluate.</param>
+        /// <param name="alpha">The minimum score that player X is currently assured of.</param>
+        /// <param name="beta">The maximum score that player O is currently assured of.</param>
+        /// <param name="isTurnX"></param>
+        /// <returns></returns>
+        public static int Minimax(GameBoard board, int alpha, int beta, bool isTurnX)
         {
-            return null;
+            char winner = board.TestBoard();
+            if (winner == 'X') { return 1; }
+            if (winner == 'O') { return -1; }
+            if (winner == 'T') { return 0; }
+
+            List<GameBoard> children = GenerateChildren(board);
+            if (isTurnX)
+            {
+                int v = -2;
+                foreach (GameBoard child in children)
+                {
+                    v = Math.Max(v, Minimax(child, alpha, beta, false));
+                    alpha = Math.Max(alpha, v);
+                    if (alpha >= beta)
+                    {
+                        break;
+                    }
+                }
+                return v;
+            }
+            else
+            {
+                int v = 2;
+                foreach (GameBoard child in children)
+                {
+                    v = Math.Min(v, Minimax(child, alpha, beta, true));
+                    beta = Math.Min(beta, v);
+                    if (alpha >= beta)
+                    {
+                        break;
+                    }
+                }
+                return v;
+            }
+
         }
 
-        public List<GameBoard> GenerateChildren(GameBoard board)
+        /// <summary>
+        /// Gets all potential moves of the specified game board for the current player, in the form of a 
+        /// List of GameBoards where each board has one of the moves performed.
+        /// </summary>
+        /// <param name="board">The GameBoard whose children should be generated.</param>
+        /// <returns>Returns a List of GameBoards, each representing possible states that the specified GameBoard could reach.</returns>
+        public static List<GameBoard> GenerateChildren(GameBoard board)
         {
             List<GameBoard> children = new List<GameBoard>();
 
-
+            Utility.ActOnMatrix((i, j) =>
+            {
+                if (board.MoveMatrix[i, j] == 'N')
+                {
+                    GameBoard copy = board.Duplicate();
+                    copy.Mark(j, i);
+                    children.Add(copy);
+                }
+            });
 
             return children;
         }
@@ -256,6 +355,7 @@ namespace TicTacToe
         GameBoard gameBoard;
         bool isFinished = false;
         PictureBox[,] markMatrix;
+        bool computerStart = true;
 
         const double markWidthScalar = 0.65;
         const double markHeightScalar = 0.65;
@@ -268,16 +368,15 @@ namespace TicTacToe
         {
 
             this.gameBoard = new GameBoard();
+            
             this.Click += (sender, e) =>
             {
                 MouseEventArgs click = (MouseEventArgs)e;
-                ProcessClick(click.X, click.Y);
+                ProcessClick(click.X, click.Y);          
             };
 
-            
             this.Image = TicTacToeEngine.Properties.Resources.TicTaceToeBoard;
             markMatrix = new PictureBox[gameBoard.MoveMatrix.GetLength(0), gameBoard.MoveMatrix.GetLength(1)];
-
         }
 
         /// <summary>
@@ -286,13 +385,9 @@ namespace TicTacToe
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
-            for (int i = 0; i < markMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < markMatrix.GetLength(1); j++)
-                {
-                    markMatrix[i, j] = CreateMark(j, i);
-                }
-            }
+            Utility.ActOnMatrix((i, j) => markMatrix[i, j] = CreateMark(j, i));
+            Reset();
+              
         }
 
         /// <summary>
@@ -306,20 +401,39 @@ namespace TicTacToe
 
             if (isFinished) return;
             int unitX = this.Width / 3;
-            int unitY = this.Height / 3;       
+            int unitY = this.Height / 3;
             int convertedX = x / unitX;
             int convertedY = y / unitY;
 
-            if (gameBoard.Mark(convertedX, convertedY))
+            convertedX = (convertedX > 2) ? 2 : convertedX;
+            convertedY = (convertedY > 2) ? 2 : convertedY;
+
+            Mark(convertedX, convertedY);
+            
+            if (!isFinished)
             {
-                UpdateMarks();
+                int[] move = AIEngine.GetNextMove(gameBoard);
+                Mark(move[0], move[1]);
+            }
+        }
+
+        /// <summary>
+        /// Marks the GameBoard and updates graphics.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the space to mark.</param>
+        /// <param name="y"><The y-coordinate of the space to mark./param>
+
+        public void Mark(int x, int y)
+        {
+            if (gameBoard.Mark(x, y))
+            {
                 char winner = gameBoard.TestBoard();
                 if (winner != 'N')
                 {
                     isFinished = true;
                     Debug.WriteLine(winner);
                 }
-                
+                UpdateMarks();
             }
         }
 
@@ -340,7 +454,7 @@ namespace TicTacToe
             mark.Height = (int)((this.Height / 3) * markHeightScalar);
             mark.Left = point[0];
             mark.Top = point[1];
-           
+
 
             mark.Visible = false;
             mark.Parent = this;
@@ -350,33 +464,30 @@ namespace TicTacToe
         /// <summary>
         /// Updates the mark images to reflect the data of the gameBoard field.
         /// </summary>
-        private void UpdateMarks()
-        {
-            for (int i = 0; i < gameBoard.MoveMatrix.GetLength(0); i++)
+        public void UpdateMarks()
+        {       
+            Utility.ActOnMatrix((i, j) =>
             {
-                for (int j = 0; j < gameBoard.MoveMatrix.GetLength(1); j++)
+                char mark = gameBoard.MoveMatrix[i, j];
+                if (markMatrix[i, j] == null)
                 {
-                    char mark = gameBoard.MoveMatrix[i, j];
-                    if (markMatrix[i, j] == null)
-                    {
-                        return;
-                    }
-                    switch(mark)
-                    {
-                        case ('N'):
-                            markMatrix[i, j].Visible = false;
-                            continue;
-                        case ('X'):
-                            markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
-                            break;
-                        case ('O'):
-                            markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeO;                         
-                            break;                       
-                    }
-                    markMatrix[i, j].Visible = true;
-
+                    return;
                 }
-            }
+                switch (mark)
+                {
+                    case ('N'):
+                        markMatrix[i, j].Visible = false;
+                        break;
+                    case ('X'):
+                        markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
+                        markMatrix[i, j].Visible = true;
+                        break;
+                    case ('O'):
+                        markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeO;
+                        markMatrix[i, j].Visible = true;
+                        break;
+                }
+            });                          
         }
 
         /// <summary>
@@ -401,12 +512,20 @@ namespace TicTacToe
             return result;
         }
 
+        /// <summary>
+        /// Resets the game board.
+        /// </summary>
         public void Reset()
         {
+            isFinished = false;
             this.GameBoard = new GameBoard();
-        }
 
-   
+            if (computerStart)
+            {
+                int[] move = AIEngine.GetNextMove(gameBoard);
+                Mark(move[0], move[1]);
+            }
+        }
 
         /// <summary>
         /// The GameBoard property represents the data for which spaces are marked, which this control draws.
@@ -423,5 +542,32 @@ namespace TicTacToe
         }
 
 
+    }
+
+    /// <summary>
+    /// A Utility class, which contains useful methods for all classes.
+    /// </summary>
+    public class Utility
+    {
+
+        public delegate void ActMethod(int i, int j);
+        /// <summary>
+        /// Performs the specified method (conforming to the ActMethod delegate) on each
+        /// element of the matrix.  Essentially, this is shorthand for the nested loop through
+        /// the matrix that I see repeatedly in this project.
+        /// </summary>
+        /// <param name="method">The method to apply.</param>
+        /// <param name="width">The (optional) width of the matrix, defaulting to 3.</param>
+        /// <param name="height">The (optional) height of the matrix, defaulting to 3.</param>
+        public static void ActOnMatrix(ActMethod method, int width=3, int height=3)
+        {
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    method(i, j);
+                }
+            }
+        }
     }
 }
