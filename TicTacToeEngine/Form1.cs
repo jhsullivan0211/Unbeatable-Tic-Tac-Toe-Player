@@ -24,9 +24,8 @@ namespace TicTacToeEngine
         private void resetButton_Click(object sender, EventArgs e)
         {
             bool computerStart = computerStartBox.Checked;
-            bool playChoice = playerChoiceBox.Checked;
-
-            ticTacToeBoard1.Reset(computerStart, playChoice);
+            bool playAsX = playerChoiceBox.Checked;
+            ticTacToeBoard1.Reset(computerStart, playAsX);
         }
 
         private void ticTacToeBoard1_Load(object sender, EventArgs e)

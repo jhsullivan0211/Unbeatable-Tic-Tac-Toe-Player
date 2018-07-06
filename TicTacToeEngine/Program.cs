@@ -153,6 +153,7 @@ namespace TicTacToe
         public GameBoard Duplicate()
         {
             GameBoard copy = new GameBoard();
+            char turn = this.CurrentTurn;
             int count = 0;
 
             Utility.ActOnMatrix((i, j) =>
@@ -173,7 +174,6 @@ namespace TicTacToe
                 }             
             });
                                     
-            char turn = (count <= 0) ? 'X' : 'O';
             copy.CurrentTurn = turn;
 
             return copy;
@@ -250,7 +250,8 @@ namespace TicTacToe
             List<GameBoard> children = GenerateChildren(board);
             List<GameBoard> winners = new List<GameBoard>();
             List<GameBoard> ties = new List<GameBoard>();
-            int desiredOutcome = board.CurrentTurn== 'X' ? 1 : -1;
+
+            int desiredOutcome = board.CurrentTurn == 'X' ? 1 : -1;
             foreach (GameBoard child in children)
             {
                 if (child.TestBoard() == board.CurrentTurn)
@@ -434,10 +435,10 @@ namespace TicTacToe
         }
 
         /// <summary>
-        /// Marks the GameBoard and updates graphics.
+        /// Marks the GameBoard at the specified coordinates.
         /// </summary>
         /// <param name="x">The x-coordinate of the space to mark.</param>
-        /// <param name="y"><The y-coordinate of the space to mark./param>
+        /// <param name="y">The y-coordinate of the space to mark.</param>
 
         public void Mark(int x, int y)
         {
@@ -485,8 +486,7 @@ namespace TicTacToe
             Utility.ActOnMatrix((i, j) =>
             {
                 char mark = gameBoard.MoveMatrix[i, j];
-                System.Drawing.Bitmap primaryImage = playAsX ? xImage : oImage;
-                System.Drawing.Bitmap secondaryImage = playAsX ? oImage : xImage;
+               
                 if (markMatrix[i, j] == null)
                 {
                     return;
@@ -497,11 +497,11 @@ namespace TicTacToe
                         markMatrix[i, j].Visible = false;
                         break;
                     case ('X'):
-                        markMatrix[i, j].Image = primaryImage;
+                        markMatrix[i, j].Image = xImage;
                         markMatrix[i, j].Visible = true;
                         break;
                     case ('O'):
-                        markMatrix[i, j].Image = secondaryImage;
+                        markMatrix[i, j].Image = oImage;
                         markMatrix[i, j].Visible = true;
                         break;
                 }
@@ -537,6 +537,7 @@ namespace TicTacToe
         {
             isFinished = false;
             this.GameBoard = new GameBoard();
+            this.GameBoard.CurrentTurn = (computerStart != playAsX) ? 'X' : 'O';
             this.playAsX = playAsX;
             this.ComputerStart = computerStart;
             message.Text = "";
@@ -549,7 +550,7 @@ namespace TicTacToe
 
         public void DisplayResult(char result)
         {
-            Debug.WriteLine(result);
+
             if (message == null)
             {
                 return;
@@ -557,6 +558,7 @@ namespace TicTacToe
             if (result == 'T')
             {
                 message.Text = "It's a tie!";
+                return;
             }
             if ((result == 'X') == playAsX)
             {
@@ -610,8 +612,13 @@ namespace TicTacToe
     /// </summary>
     public class Utility
     {
-
+        /// <summary>
+        /// Delegate for ActOnMatrix.
+        /// </summary>
+        /// <param name="i">The row to act on.</param>
+        /// <param name="j">The column to act on.</param>
         public delegate void ActMethod(int i, int j);
+
         /// <summary>
         /// Performs the specified method (conforming to the ActMethod delegate) on each
         /// element of the matrix.  Essentially, this is shorthand for the nested loop through
@@ -631,4 +638,6 @@ namespace TicTacToe
             }
         }
     }
+
+
 }
