@@ -558,14 +558,16 @@ namespace TicTacToe
             {
                 message.Text = "It's a tie!";
             }
+            if ((result == 'X') == playAsX)
+            {
+                //NOTE: it should be impossible to get here, but here's a victory message just in case.
+                message.Text = "You win!!!";
+            }
             else
             {
-                if (!playAsX)
-                {
-                    result = result == 'X' ? 'O' : 'X';
-                }
-                message.Text = result + " wins!";
+                message.Text = "You lose!";
             }
+
         }
 
         public Label ResultLabel
