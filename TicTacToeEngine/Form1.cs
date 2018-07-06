@@ -21,11 +21,17 @@ namespace TicTacToeEngine
         }
 
 
-        private void button1_Click(object sender, EventArgs e)
+        private void resetButton_Click(object sender, EventArgs e)
         {
-            ticTacToeBoard1.Reset();
+            bool computerStart = computerStartBox.Checked;
+            bool playChoice = playerChoiceBox.Checked;
+
+            ticTacToeBoard1.Reset(computerStart, playChoice);
         }
 
-        
+        private void ticTacToeBoard1_Load(object sender, EventArgs e)
+        {
+            ((TicTacToeBoard)sender).ResultLabel = label1;
+        }
     }
 }

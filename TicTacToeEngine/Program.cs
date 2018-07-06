@@ -218,6 +218,16 @@ namespace TicTacToe
             get { return this.currentTurn; }
             set { this.currentTurn = value; }
         }
+
+        /// <summary>
+        /// The TurnNumber represents the number of marks that have been put on the board.  Thus 0 represents the start of the game, 1 the state
+        /// after the 1st move, and so forth.
+        /// </summary>
+        /// <value>The TurnNumber property sets the value of the turnNumber field.</value>
+        public int TurnNumber
+        {
+            get { return turnNumber; }
+        }
     }
 
 
@@ -226,7 +236,6 @@ namespace TicTacToe
     /// </summary>
     public static class AIEngine
     {
-
 
         /// <summary>
         /// Returns the best possible move for the current player of a GameBoard to make.  Uses the minimax
@@ -241,7 +250,7 @@ namespace TicTacToe
             List<GameBoard> children = GenerateChildren(board);
             List<GameBoard> winners = new List<GameBoard>();
             List<GameBoard> ties = new List<GameBoard>();
-            int desiredOutcome = board.CurrentTurn == 'X' ? 1 : -1;
+            int desiredOutcome = board.CurrentTurn== 'X' ? 1 : -1;
             foreach (GameBoard child in children)
             {
                 if (child.TestBoard() == board.CurrentTurn)
@@ -357,7 +366,12 @@ namespace TicTacToe
         GameBoard gameBoard;
         bool isFinished = false;
         PictureBox[,] markMatrix;
-        bool computerStart = true;
+        bool computerStart = false;
+        bool playAsX = true;
+        System.Drawing.Bitmap xImage = TicTacToeEngine.Properties.Resources.TicTacToeX;
+        System.Drawing.Bitmap oImage = TicTacToeEngine.Properties.Resources.TicTacToeO;
+        Label message;
+
 
         const double markWidthScalar = 0.65;
         const double markHeightScalar = 0.65;
@@ -433,7 +447,7 @@ namespace TicTacToe
                 if (winner != 'N')
                 {
                     isFinished = true;
-                    Debug.WriteLine(winner);
+                    DisplayResult(winner);              
                 }
                 UpdateMarks();
             }
@@ -467,10 +481,12 @@ namespace TicTacToe
         /// Updates the mark images to reflect the data of the gameBoard field.
         /// </summary>
         public void UpdateMarks()
-        {       
+        {
             Utility.ActOnMatrix((i, j) =>
             {
                 char mark = gameBoard.MoveMatrix[i, j];
+                System.Drawing.Bitmap primaryImage = playAsX ? xImage : oImage;
+                System.Drawing.Bitmap secondaryImage = playAsX ? oImage : xImage;
                 if (markMatrix[i, j] == null)
                 {
                     return;
@@ -481,11 +497,11 @@ namespace TicTacToe
                         markMatrix[i, j].Visible = false;
                         break;
                     case ('X'):
-                        markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeX;
+                        markMatrix[i, j].Image = primaryImage;
                         markMatrix[i, j].Visible = true;
                         break;
                     case ('O'):
-                        markMatrix[i, j].Image = TicTacToeEngine.Properties.Resources.TicTacToeO;
+                        markMatrix[i, j].Image = secondaryImage;
                         markMatrix[i, j].Visible = true;
                         break;
                 }
@@ -517,16 +533,45 @@ namespace TicTacToe
         /// <summary>
         /// Resets the game board.
         /// </summary>
-        public void Reset()
+        public void Reset(bool computerStart=false, bool playAsX=true)
         {
             isFinished = false;
             this.GameBoard = new GameBoard();
-
+            this.playAsX = playAsX;
+            this.ComputerStart = computerStart;
+            message.Text = "";
             if (computerStart)
             {
-                int[] move = AIEngine.GetNextMove(gameBoard);
+                int[] move = AIEngine.GetNextMove(this.GameBoard);
                 Mark(move[0], move[1]);
             }
+        }
+
+        public void DisplayResult(char result)
+        {
+            Debug.WriteLine(result);
+            if (message == null)
+            {
+                return;
+            }
+            if (result == 'T')
+            {
+                message.Text = "It's a tie!";
+            }
+            else
+            {
+                if (!playAsX)
+                {
+                    result = result == 'X' ? 'O' : 'X';
+                }
+                message.Text = result + " wins!";
+            }
+        }
+
+        public Label ResultLabel
+        {
+            get { return message; }
+            set { message = value; }
         }
 
         /// <summary>
@@ -542,6 +587,18 @@ namespace TicTacToe
                 UpdateMarks();
             }
         }
+
+        /// <summary>
+        /// The ComputerStart property represents whether the computer starts the game or not..
+        /// </summary>
+        ///<value>Sets/gets the value of the computerStart field.
+        ///mark graphics.</value> 
+        public bool ComputerStart
+        {
+            get { return this.computerStart; }
+            set { this.computerStart = value; }
+        }
+
 
 
     }
