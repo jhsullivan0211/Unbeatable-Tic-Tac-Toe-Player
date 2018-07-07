@@ -31,10 +31,10 @@
             TicTacToe.GameBoard gameBoard1 = new TicTacToe.GameBoard();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.ticTacToeBoard1 = new TicTacToe.TicTacToeBoard();
+            this.label1 = new System.Windows.Forms.Label();
             this.resetButton = new System.Windows.Forms.Button();
             this.playerChoiceBox = new System.Windows.Forms.CheckBox();
             this.computerStartBox = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.ticTacToeBoard1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,6 +50,16 @@
             this.ticTacToeBoard1.Size = new System.Drawing.Size(512, 512);
             this.ticTacToeBoard1.TabIndex = 0;
             this.ticTacToeBoard1.TabStop = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(572, 357);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(235, 42);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Game Result";
             // 
             // resetButton
             // 
@@ -83,15 +93,6 @@
             this.computerStartBox.TabIndex = 3;
             this.computerStartBox.Text = "Computer Starts?";
             this.computerStartBox.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(572, 357);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 42);
-            this.label1.TabIndex = 4;
             // 
             // MainForm
             // 
